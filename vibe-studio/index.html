@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kontext Studio</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* ultra-thin scrollbars */
+    * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.2) transparent; }
+    *::-webkit-scrollbar { width: 4px; height: 4px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,.25); border-radius: 8px; }
+
+    html { height: 100%; }
+    body { font-size: 13px;}
+    select, option { color-scheme: dark; }
+
+    [x-cloak] { display: none !important; }
+
+    .glass-panel {
+        @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-2xl shadow-glass flex flex-col;
+    }
+    .panel-header {
+        @apply px-3 py-2 sm:p-3 border-b border-white/10 flex items-center justify-between flex-shrink-0;
+    }
+    .panel-content-wrapper {
+        @apply flex-1 min-h-0 overflow-hidden;
+    }
+    .panel-content {
+        @apply p-2 sm:p-3 h-full overflow-y-auto;
+    }
+  </style>
+</head>
+
+<body
+  class="h-screen max-h-screen overflow-auto bg-gradient-to-br from-slate-950 via-neutral-950 to-black text-neutral-200 antialiased"
+  x-data="{
+    activeView: 'setup',
+    isDesktop: window.innerWidth >= 768,
+    panels: { setup: true, vibes: true, output: true },
+    init() {
+        window.addEventListener('resize', () => {
+            this.isDesktop = window.innerWidth >= 768;
+        });
+    }
+  }"
+  x-cloak
+>
+  <header class="h-12 flex items-center justify-between px-4 md:px-6 border-b border-white/10 bg-white/5 backdrop-blur-xl shadow-glass flex-shrink-0 z-20">
+    <div class="flex items-center gap-2">
+      <div class="size-6 rounded bg-gradient-to-br from-fuchsia-500/70 to-indigo-500/70"></div>
+      <h1 class="text-sm font-semibold tracking-wide">Kontext Studio</h1>
+      <span class="ml-2 text-[11px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10">vibes</span>
+    </div>
+    <div id="status" class="text-[11px] text-neutral-300"></div>
+  </header>
+
+  <main class="h-[calc(100vh-3rem)] md:grid md:grid-cols-12 lg:grid-cols-12 gap-3 p-3 md:p-4 relative">
+
+    <section
+        class="glass-panel overflow-y-auto mb-36"
+        :class="{
+            'absolute inset-3 md:relative md:inset-auto': !isDesktop,
+            'md:col-span-4 lg:col-span-3': panels.setup,
+            'md:col-span-2': !panels.setup
+        }"
+        x-show="isDesktop || activeView === 'setup'"
+        x-transition:enter="transition transform ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition transform ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-2"
+    >
+      <div class="panel-header p-2 mb-2 flex items-center justify-around">
+        <div class="flex items-center gap-2">
+             <svg class="size-5 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
+            <h2 class="text-[11px] sm:text-xs font-semibold tracking-wide text-neutral-100">Setup</h2>
+        </div>
+        <button @click="panels.setup = !panels.setup" class="hidden md:block text-neutral-400 hover:text-white transition mt-2">
+            <svg x-show="panels.setup" class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clip-rule="evenodd" /></svg>
+            <svg x-show="!panels.setup" class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+        </button>
+      </div>
+
+      <div class="panel-content-wrapper" x-show="panels.setup"
+           x-transition:enter="transition-opacity ease-out duration-200"
+           x-transition:enter-start="opacity-0"
+           x-transition:enter-end="opacity-100"
+           x-transition:leave="transition-opacity ease-in duration-150"
+           x-transition:leave-start="opacity-100"
+           x-transition:leave-end="opacity-0"
+      >
+        <div class="panel-content space-y-2 sm:space-y-3">
+          <div class="rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0">
+              <div class="h-9 px-2 sm:px-3 flex items-center justify-between border-b border-white/10">
+                  <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full bg-white/10 border border-white/10">1</span>
+                      <span class="text-[11px] sm:text-[12px] font-medium text-neutral-200">Reference</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                      <button id="btnUpload" class="text-[10px] sm:text-[11px] px-2 py-1 rounded-lg bg-white/10 hover:bg-white/15 transition">Upload</button>
+                      <button id="btnImportUrl" class="text-[10px] sm:text-[11px] px-2 py-1 rounded-lg bg-white/10 hover:bg-white/15 transition">Import URL</button>
+                  </div>
+              </div>
+              <div class="h-44 xs:h-52 sm:h-[220px] md:h-[28vh] flex items-center justify-center overflow-hidden bg-black/30 relative">
+                  <img id="refPreview" src="" alt="reference" class="max-h-full object-contain transition opacity-80" />
+                  <div class="absolute bottom-2 left-2 text-[10px] text-neutral-300/80 bg-black/30 backdrop-blur px-2 py-0.5 rounded border border-white/10">Tip: drag & drop works</div>
+              </div>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0">
+                <div class="h-9 px-2 sm:px-3 flex items-center justify-between border-b border-white/10">
+                    <div class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full bg-white/10 border border-white/10">2</span> <span class="text-[11px] sm:text-[12px] font-medium text-neutral-200">Model</span></div>
+                </div>
+                <div class="p-2">
+                    <div id="modelSeg" class="flex gap-1 p-1 rounded-xl border border-white/10 bg-white/5 overflow-x-auto no-scrollbar sm:grid sm:grid-cols-3 sm:overflow-visible">
+                        <button data-model="kontext-dev" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded-lg hover:bg-white/10 transition">Kontext Dev</button>
+                        <button data-model="kontext-pro" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded-lg hover:bg-white/10 transition">Kontext Pro</button>
+                        <button data-model="prunaai-kontext-dev" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded-lg hover:bg-white/10 transition">PrunaAI Dev</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0">
+                <div class="h-9 px-2 sm:px-3 flex items-center justify-between border-b border-white/10">
+                    <div class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full bg-white/10 border border-white/10">3</span> <span class="text-[11px] sm:text-[12px] font-medium text-neutral-200">Aspect & Guidance</span></div>
+                </div>
+                <div class="p-2 sm:p-3 space-y-2 sm:space-y-3">
+                    <div class="space-y-1">
+                        <label class="text-[10px] sm:text-[11px] text-neutral-400">Aspect Ratio</label>
+                        <div id="arSeg" class="flex gap-1 p-1 rounded-lg border border-white/10 bg-white/5 overflow-x-auto no-scrollbar sm:grid sm:grid-cols-4 sm:overflow-visible">
+                            <button data-ar="match_input_image" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded hover:bg-white/10 transition">Match</button>
+                            <button data-ar="1:1" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded hover:bg-white/10 transition">1:1</button>
+                            <button data-ar="16:9" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded hover:bg-white/10 transition">16:9</button>
+                            <button data-ar="9:16" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded hover:bg-white/10 transition">9:16</button>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] sm:text-[11px] text-neutral-400">Guidance</label>
+                        <div class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5">
+                            <input id="guidance" type="range" min="0" max="10" step="0.5" value="3" class="w-full accent-indigo-400">
+                            <div class="shrink-0 text-[10px] sm:text-[11px] px-2 py-0.5 rounded bg-black/30 border border-white/10 text-neutral-200"><span id="guidanceVal">3</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <details class="group rounded-xl border border-white/10 bg-white/5 open:bg-white/5/80 transition-all duration-300">
+                <summary class="cursor-pointer list-none flex items-center justify-between px-2 sm:px-3 h-9">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center justify-center w-4 h-4 text-[10px] rounded-full bg-white/10 border border-white/10">4</span>
+                        <span class="text-[11px] sm:text-[12px] font-medium text-neutral-200">Advanced</span>
+                    </div>
+                    <svg class="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"/></svg>
+                </summary>
+                <div class="px-2 sm:px-3 pb-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 border-t border-white/10 pt-3">
+                        <div>
+                            <label class="block text-[10px] sm:text-[11px] mb-1 text-neutral-300">Seed</label>
+                            <input id="seed" type="number" placeholder="random" class="w-full px-2 py-1.5 rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-2 ring-indigo-500/40">
+                        </div>
+                        <div class="flex items-end">
+                            <label class="flex items-center gap-2 text-[10px] sm:text-[11px] w-full px-2 py-1.5 rounded bg-white/5 border border-white/10"><input id="goFast" type="checkbox" class="scale-90 accent-indigo-400" /> Go Fast</label>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] sm:text-[11px] mb-1 text-neutral-300">Safety</label>
+                            <input id="safety" type="number" min="1" max="6" value="3" class="w-full px-2 py-1.5 rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-2 ring-indigo-500/40">
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+      </div>
+    </section>
+
+    <section
+        class="glass-panel overflow-y-auto mb-24"
+        :class="{
+            'absolute inset-3 md:relative md:inset-auto': !isDesktop,
+            'md:col-span-6 lg:col-span-6': panels.vibes,
+            'md:col-span-3': !panels.vibes
+        }"
+        x-show="isDesktop || activeView === 'vibes'"
+        x-transition:enter="transition transform ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition transform ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-2"
+    >
+      <div class="panel-header">
+        <div class="flex items-center gap-2 mb-4">
+            <svg class="size-5 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>
+            <h2 class="text-xs font-semibold tracking-wide text-neutral-100">Vibes</h2>
+        </div>
+        <div class="flex items-center gap-2 mb-4">
+            <div class="relative">
+                <input id="vibeSearch" placeholder="Search vibes…" class="pl-8 pr-2 py-1.5 w-32 sm:w-[180px] rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-2 ring-indigo-500/40 text-[12px] placeholder:text-neutral-500" />
+                <svg class="absolute left-2 top-1.5 size-4 opacity-60" viewBox="0 0 20 20" fill="currentColor"><path d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387-1.414 1.414-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z"/></svg>
+            </div>
+             <button id="btnFreestyle" class="px-2 py-1.5 text-[11px] whitespace-nowrap rounded-lg bg-white/10 hover:bg-white/15 transition">Freestyle</button>
+            <button @click="panels.vibes = !panels.vibes" class="hidden md:block text-neutral-400 hover:text-white transition">
+                <svg x-show="panels.vibes" class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clip-rule="evenodd" /></svg>
+                <svg x-show="!panels.vibes" class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+            </button>
+        </div>
+      </div>
+      <div class="panel-content-wrapper" x-show="panels.vibes"
+           x-transition:enter="transition-opacity ease-out duration-200"
+           x-transition:enter-start="opacity-0"
+           x-transition:enter-end="opacity-100"
+           x-transition:leave="transition-opacity ease-in duration-150"
+           x-transition:leave-start="opacity-100"
+           x-transition:leave-end="opacity-0"
+      >
+        <div class="panel-content flex flex-col">
+          <div id="vibesWrap" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto flex-1 min-h-0 px-2">
+            </div>
+          <div class="grid grid-cols-1 gap-10 mt-3 border-t border-white/10 pt-3 flex-shrink-0">
+            <div>
+                <label class="block text-[11px] mb-1 text-neutral-300">Tile Prompt</label>
+                <textarea id="tilePrompt" rows="4" class="w-full px-2 py-1.5 rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-2 ring-indigo-500/40 h-[10vh] md:h-full"></textarea>
+            </div>
+            <div>
+                <label class="block text-[11px] mb-1 text-neutral-300">Tuner Text</label>
+                <textarea id="tunerText" rows="4" class="w-full px-2 py-1.5 rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-2 ring-indigo-500/40 h-[32px] md:h-full"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+        class="glass-panel"
+        :class="{
+            'absolute inset-3 md:relative md:inset-auto': !isDesktop,
+            'md:col-span-2 lg:col-span-3': panels.output,
+            
+            'md:col-span-1': !panels.output
+        }"
+        x-show="isDesktop || activeView === 'output'"
+        x-transition:enter="transition transform ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition transform ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-2"
+    >
+      <div class="panel-header">
+         <div class="flex items-center gap-2 mb-4">
+            <svg class="size-5 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
+            <h2 class="text-xs font-semibold tracking-wide text-neutral-100">Output</h2>
+        </div>
+        <button @click="panels.output = !panels.output" class="hidden md:block text-neutral-400 hover:text-white transition mb-4">
+            <svg x-show="panels.output" class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clip-rule="evenodd" /></svg>
+            <svg x-show="!panels.output" class="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+        </button>
+      </div>
+
+      <div class="panel-content-wrapper" x-show="panels.output"
+           x-transition:enter="transition-opacity ease-out duration-200"
+           x-transition:enter-start="opacity-0"
+           x-transition:enter-end="opacity-100"
+           x-transition:leave="transition-opacity ease-in duration-150"
+           x-transition:leave-start="opacity-100"
+           x-transition:leave-end="opacity-0"
+      >
+        <div class="panel-content">
+            <div class="flex flex-col h-full">
+                <!-- <button id="btnGenerateDesktop" class="hidden md:flex mb-3 w-full items-center justify-center px-3 py-1.5 text-[12px] rounded-lg bg-gradient-to-r from-indigo-500/80 to-fuchsia-500/80 hover:from-indigo-500 hover:to-fuchsia-500 text-white transition shadow-lg">Generate</button> -->
+                <div id="outputPanel" class="relative rounded-lg border border-white/10 bg-black/20 overflow-hidden flex items-center justify-center flex-1 min-h-0">
+                    <div id="spinner" class="hidden absolute inset-0 bg-black/40 backdrop-blur flex items-center justify-center">
+                        <div class="animate-spin size-8 border-2 border-white/30 border-t-white/80 rounded-full"></div>
+                    </div>
+                    <img id="genPreview" src="" alt="output" class="hidden max-h-full w-full object-contain opacity-90 transition" />
+                    <div id="placeholderOut" class="text-neutral-500 text-xs text-center p-4">Generated image will appear here</div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-neutral-400 mt-2 flex-shrink-0">
+                    <div id="jobInfo" class="truncate pr-2"></div>
+                    <a id="downloadLink" href="#" class="hidden px-2 py-1 rounded bg-white/10 border border-white/10 hover:bg-white/15 transition">Download</a>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="fixed bottom-0 inset-x-0 p-2 bg-neutral-950/80 border-t border-white/10 backdrop-blur-xl z-10 flex items-center justify-center ">
+    <div class="flex justify-around items-center h-14 gap-x-2 sm:gap-x-4 text-center w-full">
+        <button @click="activeView = 'setup'" class="md:hidden flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors w-16" :class="activeView === 'setup' ? 'text-indigo-400' : 'text-neutral-400 hover:bg-white/5'">
+            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
+            <span class="text-[10px] font-medium text-center">Setup</span>
+        </button>
+        <button @click="activeView = 'vibes'" class="md:hidden flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors w-16" :class="activeView === 'vibes' ? 'text-indigo-400' : 'text-neutral-400 hover:bg-white/5'">
+            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>
+            <span class="text-[10px] font-medium text-center">Vibes</span>
+        </button>
+
+        <button id="btnGenerateMobile" class="md:w-3xs px-4 py-3 rounded-xl text-[14px] font-medium bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white shadow-xl transition mx-2">
+            Generate
+        </button>
+
+        <button @click="activeView = 'output'" class="md:hidden flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors w-16" :class="activeView === 'output' ? 'text-indigo-400' : 'text-neutral-400 hover:bg-white/5'">
+             <svg class="size-6 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
+            <span class="text-[10px] font-medium text-center">Output</span>
+        </button>
+    </div>
+  </div>
+
+  <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" />
+  <dialog id="urlDialog" class="rounded-xl p-0 bg-neutral-900/95 text-neutral-100 border border-white/10 backdrop:bg-black/50">
+    <form method="dialog" class="p-4 space-y-3">
+        <h3 class="text-sm font-semibold">Import reference from URL</h3>
+        <input id="urlField" type="url" placeholder="https://..." class="w-full px-2 py-1.5 rounded bg-white/5 border border-white/10 focus:outline-none focus:ring-2 ring-indigo-500/40">
+        <div class="flex justify-end gap-2 pt-2">
+            <button value="cancel" class="px-2 py-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/10">Cancel</button>
+            <button id="urlOk" value="ok" class="px-2 py-1.5 rounded bg-gradient-to-r from-indigo-500/80 to-fuchsia-500/80 text-white">Import</button>
+        </div>
+    </form>
+  </dialog>
+
+  <script type="module">
+    import { $, $$, api, uploadReference, importReferenceUrl } from "/static/app.js";
+    // ... all the previous JS logic from the original file ...
+    // NOTE: For brevity, the JS logic is omitted here, but you should use the
+    // full script from the previous step as it is still correct.
+    // The following is a placeholder for the original <script type="module"> content
+    // to ensure the page remains functional.
+
+    // ------- Mock `toast` if app.js is not present for testing -------
+    const toast = window.toast || ((msg) => console.log(`Toast: ${msg}`));
+
+    // ------- State -------
+    const state = {
+      reference_path: "runs/refs/DEFAULT_PLACEHOLDER.png",
+      model: "prunaai-kontext-dev",
+      aspect_ratio: "match_input_image",
+      guidance: 5,
+      go_fast: false,
+      seed: null,
+      safety_tolerance: 2,
+      tile_prompt: "",
+      tuner_text: ""
+    };
+
+    // ------- Helpers -------
+    function selectSeg(segEl, value, attr) {
+        if (!segEl) return;
+        $$("button", segEl).forEach(btn => {
+            const on = btn.dataset[attr] === value;
+            btn.classList.toggle("bg-white/15", on);
+            btn.classList.toggle("text-white", on);
+        });
+    }
+    function updateStatus(msg) { if ($("#status")) $("#status").textContent = msg; }
+    function setPreviewRef(path) {
+        const img = $("#refPreview");
+        if (!img) return;
+        img.src = path || "";
+        img.classList.toggle("opacity-0", !path);
+    }
+    function showSpinner(on) { if ($("#spinner")) $("#spinner").classList.toggle("hidden", !on); }
+    function setOutput(src) {
+        const img = $("#genPreview");
+        if (!img) return;
+        img.src = src || "";
+        img.classList.toggle("hidden", !src);
+        if ($("#placeholderOut")) $("#placeholderOut").classList.toggle("hidden", !!src);
+        if ($("#downloadLink")) $("#downloadLink").classList.toggle("hidden", !src);
+    }
+    function highlight(el) {
+        $$("#vibesWrap button").forEach(b => b.classList.remove("ring-2", "ring-indigo-500/40", "bg-white/10"));
+        if (el) el.classList.add("ring-2", "ring-indigo-500/40", "bg-white/10");
+    }
+
+    // ------- Init UI -------
+    function initUI() {
+        $("#tilePrompt").value = state.tile_prompt;
+        $("#tunerText").value = state.tuner_text;
+        $("#guidance").value = state.guidance;
+        $("#guidanceVal").textContent = state.guidance;
+        $("#safety").value = state.safety_tolerance;
+        setPreviewRef(state.reference_path);
+        selectSeg($("#modelSeg"), state.model, "model");
+        selectSeg($("#arSeg"), state.aspect_ratio, "ar");
+        updateStatus("Loading vibes…");
+    }
+
+    // ------- Load vibes -------
+    let allVibes = [];
+    async function loadVibes() {
+        try {
+            const { vibes } = await api("/prompts");
+            allVibes = vibes || [];
+            renderVibes(allVibes);
+            updateStatus(`Loaded ${allVibes.length} vibes`);
+        } catch (e) {
+            updateStatus("Vibes unavailable");
+            console.error(e);
+        }
+    }
+
+    // ------- Events: Reference -------
+    $("#btnUpload")?.addEventListener("click", () => $("#fileInput").click());
+    $("#fileInput")?.addEventListener("change", async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const res = await uploadReference(file);
+            state.reference_path = res.path;
+            setPreviewRef(res.path);
+            toast("Reference uploaded");
+        } catch (err) {
+            console.error(err);
+            toast("Upload failed");
+        } finally {
+            e.target.value = "";
+        }
+    });
+
+    const urlDlg = $("#urlDialog");
+    $("#btnImportUrl")?.addEventListener("click", () => urlDlg.showModal());
+    urlDlg?.addEventListener("close", () => $("#urlField").value = "");
+    $("#urlOk")?.addEventListener("click", async (evt) => {
+        evt.preventDefault();
+        const url = $("#urlField").value.trim();
+        if (!url) return;
+        try {
+            const res = await importReferenceUrl(url);
+            state.reference_path = res.path;
+            setPreviewRef(res.path);
+            toast("Reference imported");
+            urlDlg.close();
+        } catch (err) {
+            console.error(err);
+            toast("Import failed");
+        }
+    });
+
+    // ------- Events: Settings -------
+    $("#modelSeg")?.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-model]");
+        if (!btn) return;
+        state.model = btn.dataset.model;
+        selectSeg($("#modelSeg"), state.model, "model");
+    });
+    $("#arSeg")?.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-ar]");
+        if (!btn) return;
+        state.aspect_ratio = btn.dataset.ar;
+        selectSeg($("#arSeg"), state.aspect_ratio, "ar");
+    });
+    $("#guidance")?.addEventListener("input", (e) => {
+        state.guidance = parseFloat(e.target.value);
+        $("#guidanceVal").textContent = state.guidance;
+    });
+    $("#seed")?.addEventListener("input", (e) => {
+        const v = e.target.value;
+        state.seed = v === "" ? null : parseInt(v, 10);
+    });
+    $("#goFast")?.addEventListener("change", (e) => state.go_fast = !!e.target.checked);
+    $("#safety")?.addEventListener("input", (e) => state.safety_tolerance = parseInt(e.target.value || "3", 10));
+
+    // ------- Vibes rendering -------
+    function renderVibes(list) {
+        const wrap = $("#vibesWrap");
+        if (!wrap) return;
+        wrap.innerHTML = "";
+        for (const v of list) {
+            const el = document.createElement("button");
+            el.className = "group text-left p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition focus:outline-none focus:ring-2 ring-indigo-500/40";
+            el.innerHTML = `
+              <div class="text-[11px] text-neutral-400 mb-1">${v.category}</div>
+              <div class="text-[12px] font-medium text-neutral-100 line-clamp-2">${v.title}</div>
+              <div class="mt-2 text-[11px] text-neutral-400 line-clamp-3 opacity-80">${escapeHtml(v.prompt)}</div>
+            `;
+            el.addEventListener("click", () => {
+                state.tile_prompt = v.prompt || "";
+                $("#tilePrompt").value = state.tile_prompt;
+                highlight(el);
+            });
+            wrap.appendChild(el);
+        }
+    }
+    $("#vibeSearch")?.addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = allVibes.filter(v => (v.title+v.category+v.prompt).toLowerCase().includes(q));
+        renderVibes(filtered);
+    });
+    function escapeHtml(s="") {
+        return s.replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]));
+    }
+    $("#btnFreestyle")?.addEventListener("click", () => {
+        state.tile_prompt = "";
+        $("#tilePrompt").value = "";
+        $("#tilePrompt").focus();
+        highlight(null); // Deselect any vibe
+        toast("Freestyle mode: write your own prompt!");
+    });
+
+    // ------- Generate -------
+    async function doGenerate() {
+        if (!state.reference_path) { toast("Add a reference image first"); return; }
+        const payload = {
+            reference_path: state.reference_path,
+            model: state.model,
+            aspect_ratio: state.aspect_ratio,
+            guidance: state.guidance,
+            go_fast: state.go_fast,
+            seed: state.seed,
+            safety_tolerance: state.safety_tolerance,
+            tile_prompt: $("#tilePrompt").value.trim(),
+            tuner_text: $("#tunerText").value.trim(),
+        };
+        console.log(payload)
+
+        $("#jobInfo").textContent = "Submitting…";
+        showSpinner(true);
+        setOutput("");
+        try {
+            const { job_id } = await api("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            $("#jobInfo").textContent = `Job ${job_id} running…`;
+            toast("Job started");
+            pollJob(job_id);
+        } catch (err) {
+            console.error(err);
+            showSpinner(false);
+            $("#jobInfo").textContent = "Error submitting job";
+            toast("Failed to start");
+        }
+    }
+
+    async function pollJob(id) {
+        let tries = 0;
+        const tick = async () => {
+            tries++;
+            try {
+                const job = await api(`/jobs/${id}`);
+                if (job.status === "succeeded") {
+                    showSpinner(false);
+                    $("#jobInfo").textContent = `Done in ${(Date.now()/1000 - job.created_at).toFixed(1)}s`;
+                    const dl = `/api/jobs/${id}/download`;
+                    setOutput(dl);
+                    $("#downloadLink").href = dl;
+                    toast("Generation complete");
+                    return;
+                }
+                if (job.status === "failed") {
+                    showSpinner(false);
+                    $("#jobInfo").textContent = `Failed: ${job.error || "unknown error"}`;
+                    toast("Generation failed");
+                    return;
+                }
+                $("#jobInfo").textContent = `Status: ${job.status}…`;
+                setTimeout(tick, Math.min(4000, 800 + tries * 200));
+            } catch (e) {
+                console.error(e);
+                showSpinner(false);
+                $("#jobInfo").textContent = "Error polling job";
+            }
+        };
+        tick();
+    }
+
+    $("#btnGenerateDesktop")?.addEventListener("click", doGenerate);
+    $("#btnGenerateMobile")?.addEventListener("click", doGenerate);
+
+    initUI();
+    loadVibes();
+  </script>
+</body>
+</html>

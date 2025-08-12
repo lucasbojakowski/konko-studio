@@ -1,0 +1,169 @@
+version: 2
+
+# Base template (lines with empty placeholders are omitted)
+template: |
+  {subject_or_subjects} 
+  {location_description}, 
+  {pose}, 
+  {facial_expression}. 
+  {clothing}, 
+  {accessories}, 
+  {hairstyle}. 
+  {background_elements}.
+  {lighting}.
+  {camera_angle_and_composition}.
+
+globals:
+  defaults:
+    subject_or_subjects: "she "
+    facial_expression: ""
+    accessories: ""
+    hairstyle: ""
+    background_elements: ""
+    lighting: ""
+    camera_angle_and_composition: ""
+  mixins:
+    lighting:
+      ringlight_glow: "ring light catchlights, soft wrap, subtle falloff"
+      window_soft: "north window light, gentle fill, airy"
+      rgb_room: "RGB LED wash, colored edges, dim ambient"
+      golden_hour: "low sun warm edge light, soft fill, gentle halation"
+      studio_soft: "soft key at 45°, fill ratio 1:4, subtle floor bounce"
+    camera:
+      vertical_handheld: "9:16 vertical, handheld energy, slight parallax"
+      mirror_frontcam: "front camera through mirror, natural distortion"
+      portrait_85mm: "85mm look, f/4, slight subject isolation"
+      eye_level_centered: "eye-level, centered composition"
+      influencer_angles: "alternating three-quarter and over-shoulder angles, subject dominant in frame"
+    bg:
+      cafe_corner: "window table, latte art, leafy plant"
+      rooftop_sunset: "cityline horizon, string lights, distant traffic"
+      bedroom_cozy: "linen duvet, soft pillows, warm wood"
+      gaming_room: "LED strips, desk setup, blurred monitors"
+
+categories:
+  - id: instagram
+    title: "Instagram Aesthetic"
+    tiles:
+      - id: mirror_fit_check
+        title: "Mirror fit check"
+        defaults:
+          location_description: "is in a bright bedroom mirror setup"
+          pose: "one hip pop, phone held high, elbow out"
+          facial_expression: "relaxed slight smile"
+          clothing: "add custom clothes"
+          accessories: "minimal rings and phone charm"
+          hairstyle: "sleek center part"
+          background_elements: "@mixin.bg.bedroom_cozy"
+          lighting: "@mixin.lighting.window_soft"
+          camera_angle_and_composition: "@mixin.camera.mirror_frontcam"
+
+      - id: sunlit_cafe
+        title: "Sunlit cafe"
+        defaults:
+          location_description: "is by a cafe window with latte and notebook"
+          pose: "seated, lean toward lens, forearm on table, chin tilt"
+          facial_expression: "soft engaged gaze"
+          clothing: "add custom clothes"
+          accessories: "delicate layered necklaces"
+          hairstyle: "loose waves"
+          background_elements: "@mixin.bg.cafe_corner"
+          lighting: "@mixin.lighting.window_soft"
+          camera_angle_and_composition: "@mixin.camera.portrait_85mm"
+
+      - id: rooftop_golden
+        title: "Rooftop golden hour"
+        defaults:
+          location_description: "is on a rooftop with sunset skyline"
+          pose: "back to sun, head over shoulder, hands in hair"
+          facial_expression: "content, eyes closed"
+          clothing: "add custom clothes"
+          accessories: "thin hoops"
+          hairstyle: "wind-lifted hair"
+          background_elements: "@mixin.bg.rooftop_sunset"
+          lighting: "@mixin.lighting.golden_hour"
+          camera_angle_and_composition: "@mixin.camera.influencer_angles"
+
+  - id: tiktok
+    title: "TikTok Trends"
+    tiles:
+      - id: grwm_mirror
+        title: "GRWM mirror"
+        defaults:
+          location_description: "is in a minimalist bathroom mirror"
+          pose: "one-hand hair fluff, other hand holds product near face"
+          facial_expression: "chatty smile mid-sentence"
+          clothing: "add custom clothes"
+          accessories: "simple studs"
+          hairstyle: "half-up clip"
+          background_elements: "clean counter, skincare lineup"
+          lighting: "@mixin.lighting.ringlight_glow"
+          camera_angle_and_composition: "@mixin.camera.vertical_handheld"
+
+      - id: dance_loop
+        title: "Dance loop"
+        defaults:
+          location_description: "is in a living room with open space"
+          pose: "mid-step, arms in frame, dynamic turn"
+          facial_expression: "energetic, playful"
+          clothing: "add custom clothes"
+          accessories: "sport watch"
+          hairstyle: "high ponytail"
+          background_elements: "sofa edge, plants, soft rug"
+          lighting: "@mixin.lighting.rgb_room"
+          camera_angle_and_composition: "@mixin.camera.vertical_handheld"
+
+      - id: transition_spin
+        title: "Transition spin"
+        defaults:
+          location_description: "is in a tidy hallway for clean background"
+          pose: "spin with skirt flare, arms long"
+          facial_expression: "surprised reveal grin"
+          clothing: "add custom clothes"
+          accessories: "tiny shoulder bag"
+          hairstyle: "from messy bun to sleek down"
+          background_elements: "neutral walls, framed art"
+          lighting: "@mixin.lighting.window_soft"
+          camera_angle_and_composition: "@mixin.camera.influencer_angles"
+
+  - id: onlyfans
+    title: "OnlyFans Premium"
+    tiles:
+      - id: boudoir_luxe
+        title: "Boudoir luxe (non-explicit)"
+        defaults:
+          location_description: "is in a softly lit bedroom on a neatly made bed"
+          pose: "seated at edge, shoulders angled, one leg crossed"
+          facial_expression: "sultry but relaxed"
+          clothing: "add custom clothes"
+          accessories: "delicate anklet"
+          hairstyle: "tousled waves"
+          background_elements: "@mixin.bg.bedroom_cozy"
+          lighting: "@mixin.lighting.studio_soft"
+          camera_angle_and_composition: "@mixin.camera.portrait_85mm"
+
+      - id: shower_silhouette
+        title: "Shower silhouette (implied)"
+        defaults:
+          location_description: "is behind frosted glass in a modern shower"
+          pose: "profile outline, hand on glass, knee bent"
+          facial_expression: "calm"
+          clothing: "add custom clothes"
+          accessories: ""
+          hairstyle: "slicked back"
+          background_elements: "soft steam, tiled wall bokeh"
+          lighting: "@mixin.lighting.window_soft"
+          camera_angle_and_composition: "@mixin.camera.influencer_angles"
+
+      - id: robe_tease
+        title: "Robe tease (covered)"
+        defaults:
+          location_description: "is standing by a hotel window with city lights"
+          pose: "robe wrapped, one shoulder peek, weight on back leg"
+          facial_expression: "knowing half-smile"
+          clothing: "add custom clothes"
+          accessories: "simple pendant"
+          hairstyle: "loose braid"
+          background_elements: "sheer curtains, faint skyline"
+          lighting: "@mixin.lighting.ringlight_glow"
+          camera_angle_and_composition: "@mixin.camera.portrait_85mm"
